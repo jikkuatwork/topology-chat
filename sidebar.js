@@ -1,17 +1,5 @@
-const SAMPLE_DATA = {
-    peerId: '12D3KooWG7fy8NSoA7eF9iD9qLsjCqh9QSCDBFUQUK5TubW2q9DL',
-    roomId: 'people',
-    roomPeers: [
-        '12D3KooWLGuTtCHLpd1SBHeyvzT3kHVe2dw8P7UdoXsfQHu8qvkf',
-        '12D3KooWBu1pZ3v2u6tXSmkN35kiMLENpv3bEXcyT1GJTVhipAkG',
-        '12D3KooWFNanGb5aCijGTvbQqoQxbZ9uPhFjDWqWfii1kRcmqnkc'
-    ],
-    discoveryPeers: [
-        '12D3KooWLGuTtCHLpd1SBHeyvzT3kHVe2dw8P7UdoXsfQHu8qvkf',
-        '12D3KooWBu1pZ3v2u6tXSmkN35kiMLENpv3bEXcyT1GJTVhipAkG',
-        '12D3KooWFNanGb5aCijGTvbQqoQxbZ9uPhFjDWqWfii1kRcmqnkc'
-    ]
-};
+let lastPeerId = '';
+let lastRoomId = '';
 
 function truncatePeerId(peerId, length = 12) {
     if (!peerId || peerId.length <= length) return peerId;
@@ -57,8 +45,7 @@ function createSidebar() {
                     </button>
                     <input type="text" id="roomInput" 
                         class="flex-1 min-w-0 border input-field px-3 focus:outline-none focus:border-blue-500"
-                        placeholder="Room ID"
-                        value="${SAMPLE_DATA.roomId}">
+                        placeholder="Room ID">
                     <button id="joinRoomBtn" 
                         class="bg-blue-600 hover:bg-blue-700 text-white px-4 input-field rounded-md flex-shrink-0 text-sm md:text-base">
                         Join Room
@@ -72,6 +59,11 @@ function createSidebar() {
 }
 
 function updatePeerInfo(peerId, roomId, roomPeers, discoveryPeers) {
+    if (peerId === lastPeerId && roomId === lastRoomId) return;
+    
+    lastPeerId = peerId;
+    lastRoomId = roomId;
+
     const peerIdEl = document.getElementById('peerId');
     peerIdEl.textContent = peerId;
     peerIdEl.title = peerId;
@@ -97,6 +89,10 @@ function updatePeerInfo(peerId, roomId, roomPeers, discoveryPeers) {
             </div>
         `).join('') :
         '<div class="p-2.5 text-sm text-gray-500">No discovery peers</div>';
+
+    if (roomId) {
+        document.getElementById('roomInput').value = roomId;
+    }
 }
 
 function initSidebar() {
@@ -111,12 +107,6 @@ function initSidebar() {
 
     moreBtn.addEventListener('click', () => {
         sidebar.classList.remove('-translate-x-full');
-        updatePeerInfo(
-            SAMPLE_DATA.peerId,
-            SAMPLE_DATA.roomId,
-            SAMPLE_DATA.roomPeers,
-            SAMPLE_DATA.discoveryPeers
-        );
     });
 
     closeSidebarBtn.addEventListener('click', () => {
