@@ -1,41 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DRP - Chat (Vanilla JS)</title>
-  </head>
-  <body>
-    <div>
-      <h1>DRP - Chat</h1>
-      <p>Current peer ID <span id="peerId"></span></p>
-      <p>Connected to <span id="chatId"></span></p>
-      <p>peers: <span id="peers"></span></p>
-      <p>discovery_peers: <span id="discoveryPeers"></span></p>
-      <p>object_peers: <span id="objectPeers"></span></p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .icon-button {
+            flex: 0 0 48px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-      <input id="roomInput" type="text" placeholder="Room ID" />
-      <button id="joinRoom">Connect</button>
-      <button id="createRoom">Create Room</button>
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .svg-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .svg-icon-dots {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Main Chat Interface -->
+    <div class="h-screen flex flex-col">
+        <!-- Chat Area -->
+        <main class="flex-1 overflow-y-auto px-4 py-4" id="chatArea">
+            <div class="space-y-4">
+                <div class="text-center text-gray-500 py-4">No messages yet</div>
+            </div>
+        </main>
+
+        <!-- Bottom Toolbar -->
+        <div class="border-t bg-white px-2 py-2">
+            <div class="flex items-center space-x-2">
+                <button id="moreBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon-dots">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="19" cy="12" r="1"/>
+                        <circle cx="5" cy="12" r="1"/>
+                    </svg>
+                </button>
+                <input type="text" id="messageInput" 
+                    class="flex-1 min-w-0 border rounded-full px-4 py-3 focus:outline-none focus:border-blue-500"
+                    placeholder="Type a message...">
+                <button id="sendBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+                        <path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/>
+                        <path d="M6 12h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div
-      id="chat"
-      style="
-        overflow-y: scroll;
-        min-height: 200px;
-        max-height: 60vh;
-        width: 100%;
-      "
-    >
-      <!-- Messages will appear here -->
-    </div>
+    <script type="module">
+        import { createSidebar, initSidebar, updatePeerInfo } from './sidebar.js';
 
-    <div style="margin-bottom: 10px">
-      <input id="messageInput" type="text" placeholder="Message" />
-      <button id="sendMessage">Send</button>
-    </div>
+        // Add sidebar to the DOM
+        document.body.appendChild(createSidebar());
 
-    <script type="module" src="./script.js"></script>
-  </body>
+        // Initialize sidebar functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            initSidebar();
+            
+            // Example usage of updatePeerInfo
+            updatePeerInfo(
+                'peer123...abc',
+                'room456...xyz',
+                ['peer1', 'peer2', 'peer3'],
+                ['discovery1', 'discovery2']
+            );
+        });
+
+        // Message handling
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, isSent = true) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isSent ? 'justify-end' : 'justify-start'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="${isSent ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900'} 
+                            rounded-lg px-4 py-2 max-w-[80%]">
+                    ${text}
+                </div>
+            `;
+            
+            chatArea.firstElementChild.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Send message handler
+        sendBtn.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                messageInput.value = '';
+            }
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+    </script>
+</body>
 </html>
