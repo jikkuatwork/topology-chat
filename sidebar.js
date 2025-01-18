@@ -1,5 +1,6 @@
 let lastPeerId = '';
 let lastRoomId = '';
+let isConnected = false;
 
 function truncatePeerId(peerId, length = 12) {
     if (!peerId || peerId.length <= length) return peerId;
@@ -44,10 +45,10 @@ function createSidebar() {
                         </svg>
                     </button>
                     <input type="text" id="roomInput" 
-                        class="flex-1 min-w-0 border input-field px-3 focus:outline-none focus:border-blue-500"
+                        class="flex-1 min-w-0 border input-field px-3 focus:outline-none focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                         placeholder="Room ID">
                     <button id="joinRoomBtn" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 input-field rounded-md flex-shrink-0 text-sm md:text-base">
+                        class="text-white px-4 input-field rounded-md flex-shrink-0 text-sm md:text-base transition-colors">
                         Join Room
                     </button>
                 </div>
@@ -58,11 +59,29 @@ function createSidebar() {
     return sidebarEl;
 }
 
+function updateConnectionState(roomId) {
+    const roomInput = document.getElementById('roomInput');
+    const joinRoomBtn = document.getElementById('joinRoomBtn');
+    
+    isConnected = !!roomId;
+    
+    // Clear the room input when disconnected
+    if (!isConnected && roomInput.value) {
+        roomInput.value = '';
+    }
+    
+    roomInput.disabled = isConnected;
+    joinRoomBtn.textContent = isConnected ? 'Disconnect' : 'Join Room';
+    joinRoomBtn.className = `${isConnected ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 input-field rounded-md flex-shrink-0 text-sm md:text-base transition-colors`;
+}
+
 function updatePeerInfo(peerId, roomId, roomPeers, discoveryPeers) {
     if (peerId === lastPeerId && roomId === lastRoomId) return;
     
     lastPeerId = peerId;
     lastRoomId = roomId;
+
+    updateConnectionState(roomId);
 
     const peerIdEl = document.getElementById('peerId');
     peerIdEl.textContent = peerId;
