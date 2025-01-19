@@ -1,5 +1,6 @@
 import { DRPNode, Chat } from "https://storage.googleapis.com/zucket-store/topology/c2/dist/drp-chat.es.js";
 import { createSidebar, initSidebar, updatePeerInfo } from './sidebar.js';
+import { renderMessages } from './chatBubble.js';
 
 let node = null;
 let drpObject = null;
@@ -23,24 +24,12 @@ function render() {
 
     const chat = chatDRP.query_messages();
     const chatElement = document.getElementById("chatArea");
-    chatElement.innerHTML = '<div class="space-y-4">';
-
-    if (chat.size === 0) {
-        chatElement.innerHTML += '<div class="text-center text-gray-500 py-4">No messages yet</div>';
-        chatElement.innerHTML += '</div>';
-        return;
-    }
-
-    for (const message of [...chat].sort()) {
-        chatElement.innerHTML += `
-            <div class="flex">
-                <div class="bg-blue-600 text-white rounded-lg px-4 py-2 max-w-[80%]">
-                    ${message}
-                </div>
-            </div>
-        `;
-    }
-    chatElement.innerHTML += '</div>';
+    chatElement.innerHTML = `
+        <div class="space-y-4">
+            ${renderMessages(Array.from(chat), node.networkNode.peerId)}
+        </div>
+    `;
+    
     chatElement.scrollTop = chatElement.scrollHeight;
 }
 
@@ -52,7 +41,9 @@ async function sendMessage(message) {
         return;
     }
 
-    chatDRP.addMessage(timestamp, message, node.networkNode.peerId);
+    // Format: (timestamp, message, peerId)
+    const formattedMessage = `(${timestamp}, ${message}, ${node.networkNode.peerId})`;
+    chatDRP.addMessage(formattedMessage, '');
     render();
 }
 
@@ -68,25 +59,20 @@ async function createConnectHandlers() {
 
 async function disconnectFromRoom() {
     if (drpObject) {
-        // Just let go of the references and render
         drpObject = null;
         chatDRP = null;
         
-        // Clear the chat area
         const chatElement = document.getElementById("chatArea");
         chatElement.innerHTML = '<div class="space-y-4"><div class="text-center text-gray-500 py-4">No messages yet</div></div>';
         
-        // Update UI
         render();
     }
 }
 
 export async function initializeChat() {
-    // Initialize sidebar
     document.body.appendChild(createSidebar());
     initSidebar();
 
-    // Initialize DRP
     node = new DRPNode();
     await node.start();
     render();
@@ -95,14 +81,12 @@ export async function initializeChat() {
         render();
     });
 
-    // Event Handlers
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const sendBtn = document.getElementById("sendBtn");
     const messageInput = document.getElementById("messageInput");
 
     joinRoomBtn.addEventListener("click", async () => {
         if (drpObject) {
-            // If already connected, disconnect
             await disconnectFromRoom();
             return;
         }
