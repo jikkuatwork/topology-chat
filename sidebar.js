@@ -10,10 +10,10 @@ function truncatePeerId(peerId, length = 12) {
 function createSidebar() {
     const sidebarEl = document.createElement('div');
     sidebarEl.id = 'sidebar';
-    sidebarEl.className = 'fixed inset-0 bg-white transform -translate-x-full transition-transform duration-200 ease-in-out z-50';
+    sidebarEl.className = 'fixed inset-0 bg-white transform -translate-x-full transition-transform duration-200 ease-in-out z-50 flex justify-center';
     
     sidebarEl.innerHTML = `
-        <div class="h-full flex flex-col">
+        <div class="w-full max-w-2xl h-full flex flex-col relative">
             <div class="flex-1 overflow-y-auto pb-[60px]">
                 <div class="p-4 space-y-6">
                     <div>
@@ -38,7 +38,7 @@ function createSidebar() {
             </div>
 
             <div class="border-t bg-white px-2 py-2 absolute bottom-0 left-0 right-0">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2 max-w-2xl mx-auto">
                     <button id="closeSidebarBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
                             <path d="m15 18-6-6 6-6"/>

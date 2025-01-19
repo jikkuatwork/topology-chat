@@ -42,28 +42,32 @@
 </head>
 <body class="bg-gray-50">
     <div class="h-screen flex flex-col">
-        <main class="flex-1 overflow-y-auto px-4 py-4" id="chatArea">
-            <div class="space-y-4">
-                <div class="text-center text-gray-500 py-4">No messages yet</div>
-            </div>
-        </main>
+        <div class="flex-1 overflow-hidden flex justify-center">
+            <div class="w-full max-w-2xl flex flex-col">
+                <main class="flex-1 overflow-y-auto px-4 py-4" id="chatArea">
+                    <div class="space-y-4">
+                        <div class="text-center text-gray-500 py-4">No messages yet</div>
+                    </div>
+                </main>
 
-        <div class="border-t bg-white px-2 py-2">
-            <div class="flex items-center space-x-2">
-                <button id="moreBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-                </button>
-                <input type="text" id="messageInput" 
-                    class="flex-1 min-w-0 border input-field px-3 focus:outline-none focus:border-blue-500"
-                    placeholder="Type a message...">
-                <button id="sendBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
-                        <path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/>
-                        <path d="M6 12h16"/>
-                    </svg>
-                </button>
+                <div class="border-t bg-white px-2 py-2">
+                    <div class="flex items-center space-x-2">
+                        <button id="moreBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </button>
+                        <input type="text" id="messageInput" 
+                            class="flex-1 min-w-0 border input-field px-3 focus:outline-none focus:border-blue-500"
+                            placeholder="Type a message...">
+                        <button id="sendBtn" class="icon-button hover:bg-gray-100 rounded-full text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon">
+                                <path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/>
+                                <path d="M6 12h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
