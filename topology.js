@@ -5,8 +5,23 @@ import { renderMessages } from './chatBubble.js';
 let node = null;
 let drpObject = null;
 let chatDRP = null;
+let lastMessageCount = 0;
 
-function render() {
+function scrollToBottom(element) {
+    requestAnimationFrame(() => {
+        element.scrollTop = element.scrollHeight;
+    });
+}
+
+function hasNewMessages(messages) {
+    if (messages.length !== lastMessageCount) {
+        lastMessageCount = messages.length;
+        return true;
+    }
+    return false;
+}
+
+function render(isInitialRender = false) {
     if (drpObject) {
         document.getElementById("roomInput").value = drpObject.id;
     }
@@ -23,14 +38,18 @@ function render() {
     if (!chatDRP) return;
 
     const chat = chatDRP.query_messages();
+    const messages = Array.from(chat);
     const chatElement = document.getElementById("chatArea");
-    chatElement.innerHTML = `
-        <div class="space-y-4">
-            ${renderMessages(Array.from(chat), node.networkNode.peerId)}
-        </div>
-    `;
     
-    chatElement.scrollTop = chatElement.scrollHeight;
+    // Only update DOM if message count changed
+    if (hasNewMessages(messages) || isInitialRender) {
+        chatElement.innerHTML = `
+            <div class="space-y-4">
+                ${renderMessages(messages, node.networkNode.peerId)}
+            </div>
+        `;
+        scrollToBottom(chatElement);
+    }
 }
 
 async function sendMessage(message) {
@@ -44,15 +63,13 @@ async function sendMessage(message) {
     // Format: (timestamp, message, peerId)
     const formattedMessage = `(${timestamp}, ${message}, ${node.networkNode.peerId})`;
     chatDRP.addMessage(formattedMessage, '');
+    lastMessageCount = 0; // Reset to force update on next render
     render();
 }
 
 async function createConnectHandlers() {
+    // Only register one handler for new messages
     node.addCustomGroupMessageHandler(drpObject.id, () => {
-        render();
-    });
-
-    node.objectStore.subscribe(drpObject.id, () => {
         render();
     });
 }
@@ -61,6 +78,7 @@ async function disconnectFromRoom() {
     if (drpObject) {
         drpObject = null;
         chatDRP = null;
+        lastMessageCount = 0;
         
         const chatElement = document.getElementById("chatArea");
         chatElement.innerHTML = '<div class="space-y-4"><div class="text-center text-gray-500 py-4">No messages yet</div></div>';
@@ -75,8 +93,9 @@ export async function initializeChat() {
 
     node = new DRPNode();
     await node.start();
-    render();
+    render(true); // Initial render
 
+    // Minimal set of handlers
     node.addCustomGroupMessageHandler("", () => {
         render();
     });
@@ -99,8 +118,9 @@ export async function initializeChat() {
 
         drpObject = await node.createObject(new Chat(), objectId, undefined, true);
         chatDRP = drpObject.drp;
+        lastMessageCount = 0;
         createConnectHandlers();
-        render();
+        render(true); // Force initial room render
     });
 
     sendBtn.addEventListener("click", async () => {
