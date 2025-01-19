@@ -12,9 +12,16 @@ function truncatePeerId(peerId) {
 
 function parseMessage(msg) {
     try {
-        // Remove the outer parentheses and split
-        const content = msg.substring(1, msg.length - 1);
-        const [timestamp, message, peerId] = content.split(', ');
+        // Input format: ((timestamp, message, peerId), , undefined)
+        // Remove the outer wrapping and undefined
+        const mainContent = msg.split(',').slice(0, -2).join(',').trim();
+        // Remove the double parentheses at start
+        const content = mainContent.substring(2);
+        // Remove the trailing parenthesis
+        const cleanContent = content.substring(0, content.length - 1);
+        
+        const [timestamp, message, peerId] = cleanContent.split(',').map(s => s.trim());
+        
         return {
             timestamp: parseInt(timestamp),
             text: message,
@@ -22,6 +29,12 @@ function parseMessage(msg) {
         };
     } catch (e) {
         console.error('Error parsing message:', msg, e);
+        console.log('Parsing steps:', {
+            msg,
+            mainContent: msg.split(',').slice(0, -2).join(',').trim(),
+            content: msg.split(',').slice(0, -2).join(',').trim().substring(2),
+            parts: msg.split(',').slice(0, -2).join(',').trim().substring(2).split(',').map(s => s.trim())
+        });
         return null;
     }
 }
