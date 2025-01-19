@@ -1,19 +1,9 @@
 import { format } from 'https://cdn.skypack.dev/timeago.js';
 
-function generateColorFromPeerId(peerId) {
-    let hash = 0;
-    // Use the entire peerId to generate color
-    for (let i = 0; i < peerId.length; i++) {
-        hash = peerId.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    // More distinctive color generation
-    const hue = Math.abs(hash) % 360;
-    const saturation = 70 + (Math.abs(hash) % 20); // 70-90%
-    const lightness = 45 + (Math.abs(hash) % 10);  // 45-55%
-    
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-}
+const BUBBLE_COLORS = {
+    self: '#4F46E5',    // Indigo-600
+    other: '#6B7280',   // Gray-500
+};
 
 function truncatePeerId(peerId) {
     if (!peerId) return '';
@@ -46,13 +36,13 @@ function renderMessages(messages, currentPeerId) {
         .filter(msg => msg !== null)
         .map(message => {
             const isOwnMessage = message.sender === currentPeerId;
-            const messageColor = generateColorFromPeerId(message.sender);
+            const bubbleColor = isOwnMessage ? BUBBLE_COLORS.self : BUBBLE_COLORS.other;
             const timeAgo = format(message.timestamp);
 
             return `
                 <div class="flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}">
                     <div class="px-4 py-2 rounded-lg max-w-[80%] space-y-1"
-                         style="background-color: ${messageColor}">
+                         style="background-color: ${bubbleColor}">
                         <div class="text-gray-100 text-[10px] font-mono opacity-70">
                             ${truncatePeerId(message.sender)}
                         </div>
@@ -69,4 +59,4 @@ function renderMessages(messages, currentPeerId) {
         .join('');
 }
 
-export { renderMessages };
+export { renderMessages, BUBBLE_COLORS };
